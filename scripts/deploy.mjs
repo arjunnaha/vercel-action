@@ -1,16 +1,16 @@
 import fs from "node:fs";
 import os from "node:os";
 
+const branch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME;
 
 console.log("Updating environment variables...");
 await updateEnvironmentVariables();
 console.log("Environment variables updated.");
 
 console.log("Creating deployment...");
-let deployment = await createNewDeploymentForBranch(
-  process.env.GITHUB_HEAD_REF
-);
+let deployment = await createNewDeploymentForBranch(branch);
 console.log("Deployment created.");
+
 
 if (process.env.AWAIT_FOR_DEPLOYMENT === "true") {
   console.log("Waiting for deployment to be ready...");
@@ -49,7 +49,7 @@ async function updateEnvironmentVariables() {
     },
     body: JSON.stringify(
       environmentVariables.map(({ key, value }) => ({
-        gitBranch: process.env.GITHUB_HEAD_REF,
+        gitBranch: branch,
         key,
         target: ["preview"],
         type: "encrypted",
